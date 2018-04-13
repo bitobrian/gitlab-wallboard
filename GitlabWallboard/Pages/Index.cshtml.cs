@@ -13,5 +13,15 @@ namespace GitlabWallboard.Pages
         {
 
         }
+
+        public IActionResult OnPost()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+            // otherwise do some processing
+            return RedirectToPage("Wallboard");
+        }
     }
 }

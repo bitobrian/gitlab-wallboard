@@ -13,20 +13,34 @@ namespace GitlabWallboard.Pages
     public class WallBoardModel : PageModel
     {
         public List<GitLabIssues> GitlabIssues { get; set; }
-
-        private string pat = "";
-        private string project = "4701217";
+        public string Message { get; set; }
 
         static HttpClient client = new HttpClient();
 
         public void OnGet()
         {
-            GitlabIssues = GetIssuesAsync().Result;
+
         }
 
-        public async Task<List<GitLabIssues>> GetIssuesAsync()
+        public void OnPostView(string pat, string pid)
         {
-            string api = "https://gitlab.com/api/v4/projects/" + project + "/issues";
+            LoadBoard(pat, pid);
+        }
+
+        private void LoadBoard(string pat, string pid)
+        {
+            if (GitlabIssues != null)
+                RefreshBoard();
+            GitlabIssues = GetIssuesAsync(pat,pid).Result;
+        }
+
+        private void RefreshBoard()
+        {
+        }
+
+        public async Task<List<GitLabIssues>> GetIssuesAsync(string pat, string pid)
+        {
+            string api = "https://gitlab.com/api/v4/projects/" + pid + "/issues";
 
             client.BaseAddress = new Uri(api);
 
