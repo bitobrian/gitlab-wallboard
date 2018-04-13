@@ -12,5 +12,19 @@
     <title>WallBoard</title>
 </head>
 <body>
+    <label>PAT</label>
+    <input />
+    <label>PID</label>
+    <input />
+    <button>Load</button>
+    <br />
+    <br />
+    @{ 
+        foreach(var g in Model.GitlabIssues)
+        {
+            <label>Title: @g.Title</label>
+            <p>Description: @g.Description</p>
+        }
+    }
 </body>
 </html>

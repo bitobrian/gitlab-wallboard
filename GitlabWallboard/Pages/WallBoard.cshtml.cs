@@ -1,73 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Web;
-using Microsoft.AspNetCore.Mvc;
+﻿using Flurl;
+using Flurl.Http;
+using GitlabWallboard.Model;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using RestSharp;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace GitlabWallboard.Pages
 {
     public class WallBoardModel : PageModel
     {
+        public List<GitLabIssues> GitlabIssues { get; set; }
+
         private string pat = "";
-        private string api = "https://gitlab.example.com/api/v4/";
-        private string area = "projects/";
-        private string item = "/issues/";
-        private string project = "";
+        private string project = "4701217";
+
+        static HttpClient client = new HttpClient();
 
         public void OnGet()
         {
-            //HttpClient client = new HttpClient();
+            GitlabIssues = GetIssuesAsync().Result;
+        }
 
-            //client.BaseAddress = new Uri(api);
-            //client.DefaultRequestHeaders.Accept.Add("PRIVATE-TOKEN: " + pat);
+        public async Task<List<GitLabIssues>> GetIssuesAsync()
+        {
+            string api = "https://gitlab.com/api/v4/projects/" + project + "/issues";
 
-            project = "idle-adventures";
+            client.BaseAddress = new Uri(api);
 
-            var encodedUrl = api + area + project + item;
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Add("PRIVATE-TOKEN", pat);
 
-            RestClient _restClient = new RestClient();
+            
+            string product = await GetIssuesAsync(api);
 
-            RestRequest request =
-                new RestRequest($@"projects/idle-adventures/issues", Method.GET);
+            var gitLabIssues = GitLabIssues.FromJson(product);
 
-            request.Parameters.Clear();
+            return gitLabIssues;
+        }
 
-            _restClient.BaseUrl = new Uri(api);
-            //request.Parameters.Add(new Parameter()
-            //{
-            //    Name = "application/json",
-            //    ContentType = "application/json",
-            //    Type = ParameterType.RequestBody,
-            //    Value = commit
-            //});
-            request.Parameters.Add(new Parameter()
+        static async Task<string> GetIssuesAsync(string path)
+        {
+            string product = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
             {
-                Name = "PRIVATE-TOKEN",
-                Type = ParameterType.HttpHeader,
-                Value = pat
-            });
-
-            IRestResponse response = _restClient.Execute(request);
-
-            var requfest = "test";
-
-            //request.ContentType = "application/json";
-
-            //request.Headers.Add("PRIVATE-TOKEN:", pat);
-
-            //using (System.IO.Stream s = request.GetResponse().GetResponseStream())
-            //{
-            //    using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-            //    {
-            //        var jsonResponse = sr.ReadToEnd();
-            //        Console.WriteLine(String.Format("Response: {0}", jsonResponse));
-            //    }
-            //}
+                product = await response.Content.ReadAsStringAsync();
+            }
+            return product;
         }
     }
 }
