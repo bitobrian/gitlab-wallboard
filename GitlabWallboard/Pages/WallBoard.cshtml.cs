@@ -14,7 +14,8 @@ namespace GitlabWallboard.Pages
     {
         public List<GitLabIssues> GitlabIssues { get; set; }
         public string Message { get; set; }
-
+        public string GitlabBaseUrl { get; set; }
+        public string ProjectTitle { get; set; } = "Enter ur deetz";
         static HttpClient client = new HttpClient();
 
         public void OnGet()
@@ -22,25 +23,28 @@ namespace GitlabWallboard.Pages
 
         }
 
-        public void OnPostView(string pat, string pid)
+        public void OnPostView(string pat, string pid, string gitlabBaseUrl)
         {
-            LoadBoard(pat, pid);
+            LoadBoard(pat, pid, gitlabBaseUrl);
         }
 
-        private void LoadBoard(string pat, string pid)
+        private void LoadBoard(string pat, string pid, string gitlabBaseUrl)
         {
             if (GitlabIssues != null)
                 RefreshBoard();
-            GitlabIssues = GetIssuesAsync(pat,pid).Result;
+            GitlabIssues = GetIssuesAsync(pat, pid, gitlabBaseUrl).Result;
+
+            ProjectTitle = GitlabIssues[0].ProjectId.ToString();
         }
 
         private void RefreshBoard()
         {
+
         }
 
-        public async Task<List<GitLabIssues>> GetIssuesAsync(string pat, string pid)
+        public async Task<List<GitLabIssues>> GetIssuesAsync(string pat, string pid, string gitlabBaseUrl)
         {
-            string api = "https://gitlab.com/api/v4/projects/" + pid + "/issues";
+            string api = gitlabBaseUrl + "/api/v4/projects/" + pid + "/issues";
 
             client.BaseAddress = new Uri(api);
 
@@ -48,8 +52,7 @@ namespace GitlabWallboard.Pages
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Add("PRIVATE-TOKEN", pat);
-
-            
+                        
             string product = await GetIssuesAsync(api);
 
             var gitLabIssues = GitLabIssues.FromJson(product);

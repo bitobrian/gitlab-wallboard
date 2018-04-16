@@ -21,91 +21,117 @@
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
-
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
 
 </head>
-<body style="background-color:black;">    
+<body style="background-color:lightgray;">
     <div class="container-fluid">
-        <div class="row">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary btn-lg btn-block btn-raised" data-toggle="modal" data-target="#modalpopup">
+            @Model.ProjectTitle
+        </button>
+        @*<div class="row">
             <div class="col-md-12">
                 <iframe src="http://www.ustream.tv/embed/10414700?html5ui" scrolling="no" allowfullscreen webkitallowfullscreen frameborder="0" style="border: 0 none transparent; display:block; width:100%; height:auto;"></iframe>
             </div>
-        </div>
-        <div class="row">
+        </div>*@
+        @*<div class="row">
             <div class="col-md-4">
                 <form asp-page-handler="view" method="post">
                     <div class="form-group-sm">
                         <label class="label label-primary" for="pid">PID:</label><input class="form-control" name="pid" />
                         <label class="label label-primary" for="pat">PAT:</label><input class="form-control" name="pat" />
+                        <label class="label label-primary" for="gitlabBaseUrl">GitLab Base Url (https://gitlab.com)</label><input class="form-control" name="gitlabBaseUrl" />
                         <button class="btn btn-primary">Load Wallboard</button>
                     </div>
                 </form>
             </div>
+        </div>*@
+        <div class="modal" id="modalpopup" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Enter Project Deets</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-page-handler="view" method="post">
+                            <div class="form-group-sm">
+                                <label for="pid">PID:</label><input class="form-control" name="pid" />
+                                <label for="pat">PAT:</label><input class="form-control" name="pat" />
+                                <small id="emailHelp" class="form-text text-muted">We'll take your token.</small>
+                                <label for="gitlabBaseUrl">GitLab Base Url (https://gitlab.com)</label><input class="form-control" name="gitlabBaseUrl" />
+                                <button id="btnLoad" class="btn btn-primary btn-raised">Load Wallboard</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
         </div>
-        <div class="row">
+        <div class="row" id="wallboard">
             <div class="col-md-6 col-md-offset-1">
                 @{
                 if (Model.GitlabIssues != null)
                 {
                     foreach (var g in Model.GitlabIssues)
                     {
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">@g.Title</div>
-                            <div class="panel-body">
-                                <p>@g.Description</p>
+                        <div class="card" style="width: 100%;">
+                            <div class="card-body">
+                                <h5 class="card-title">@g.Title</h5>
+                                <p class="card-text">@g.Description</p>
                             </div>
                         </div>
+                        <br />
                 }
             }
                 }
             </div>
-            <div class="col-md-offset-1 col-md-2">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Total Issues</div>
-                    <div class="panel-body">
-                        @{
-                        if (Model.GitlabIssues != null)
-                        {
-                            <h1>@Model.GitlabIssues.Count()</h1>
-                    }
+            <div class="col-md-offset-1 col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title">Total Issues</div>
+                        <div class="card-text">
+                            @{
+                            if (Model.GitlabIssues != null)
+                            {
+                                <h1>@Model.GitlabIssues.Count()</h1>
                         }
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Total Issues</div>
-                    <div class="panel-body">
-                        @{
-                        if (Model.GitlabIssues != null)
-                        {
-                            <h1>@Model.GitlabIssues.Count()</h1>
-                    }
-                        }
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-        <environment include="Development">
-            <script src="~/lib/jquery/dist/jquery.js"></script>
-            <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-            <script src="~/js/site.js" asp-append-version="true"></script>
-        </environment>
-        <environment exclude="Development">
-            <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
-                    asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                    asp-fallback-test="window.jQuery"
-                    crossorigin="anonymous"
-                    integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
-            </script>
-            <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-                    asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
-                    asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                    crossorigin="anonymous"
-                    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
-            </script>
-            <script src="~/js/site.min.js" asp-append-version="true"></script>
-        </environment>
-    </body>
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+    <script>$(document).ready(function () {
+    $('body').bootstrapMaterialDesign();
+        });</script>
+</body>
 </html>
